@@ -1,0 +1,173 @@
+{
+  "name": "Daily GitHub Trending notification by Email",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "53bf597d-3f64-4375-9632-c8aed38e88df",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "https://github.com/trending?since=daily",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        240
+      ],
+      "id": "c418062f-e218-47d1-8613-8b67e52e60cd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fromEmail": "you@example.com",
+        "toEmail": "you@example.com",
+        "subject": "=Github Trending ({{ $now.format(\"DD\") }})\n",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "5b9ea851-df78-4366-a3e0-b5afb563e5ae",
+      "name": "Send email",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        1504,
+        240
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "b70385e1-5344-49cb-be71-b56759f0bf22",
+      "credentials": {
+        "smtp": {
+          "id": "1eizdlwsLy6HnKy4",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: full GitHub trending HTML in $json.body\n// Output: clean HTML containing only repo list section\n\n// Get HTML from incoming data\nconst html = $json.body || $json.data || \"\";\n\n// Safety: if nothing found, return empty\nif (!html) {\n  return [{\n    clean_html: \"\"\n  }];\n}\n\n// GitHub Trending repo list lives inside <article> tags\nconst repoSectionRegex = /<article[\\s\\S]*?<\\/article>/g;\n\n// Extract all <article> blocks\nconst matches = html.match(repoSectionRegex) || [];\n\n// Join them into clean HTML\nconst cleanHtml = matches.join(\"\\n\\n\");\n\nreturn [{\n  clean_html: cleanHtml\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        240
+      ],
+      "id": "a2788b0b-baee-4e25-9e31-cdb577fa1da7",
+      "name": "Clean Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: { clean_html: \"<article>...</article> ...\" }\n// Output: array of repos with only Name, Link, Description, Language, Stars\n\nconst cleanHtml = $json.clean_html || \"\";\nif (!cleanHtml) {\n  return [];\n}\n\n// Split into individual <article> blocks\nconst articles = cleanHtml.split(/<\\/article>/).map(a => a.trim()).filter(a => a);\n\n// Helper to extract with regex\nfunction extract(re, str) {\n  const m = re.exec(str);\n  return m ? m[1].trim() : \"\";\n}\n\nconst repos = articles.map(article => {\n  const name = extract(/<h2[^>]*>\\s*<a[^>]*>([\\s\\S]*?)<\\/a>/, article)\n    .replace(/\\s+/g, \" \") // normalize spacing\n    .trim();\n\n  const link = extract(/<h2[^>]*>\\s*<a[^>]*href=\"([^\"]+)\"/, article);\n  const desc = extract(/<p[^>]*>([\\s\\S]*?)<\\/p>/, article)\n    .replace(/<[^>]+>/g, \"\") // strip tags\n    .trim();\n\n  const language = extract(/itemprop=\"programmingLanguage\">([^<]+)</, article);\n\n  const stars = extract(/stargazers\"[^>]*>[\\s\\S]*?<\\/svg>\\s*([\\d,]+)/, article);\n\n  return {\n    json: {\n      Name: name,\n      Link: link ? \"https://github.com\" + link : \"\",\n      Description: desc,\n      Language: language,\n      Stars: stars\n    }\n  };\n});\n\nreturn repos;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        240
+      ],
+      "id": "01b69165-06ac-4bf4-8abb-4ee3731b932b",
+      "name": "Extract Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build nicer HTML for email (card style)\nconst blocks = items.map(i => `\n  <div style=\"border:1px solid #ddd; border-radius:8px; padding:12px; margin:10px 0; font-family:Arial, sans-serif;\">\n    <h3 style=\"margin:0 0 6px 0; font-size:16px; color:#0366d6;\">\n      <a href=\"${i.json.Link}\" style=\"text-decoration:none; color:#0366d6;\">${i.json.Name}</a>\n    </h3>\n    <p style=\"margin:4px 0 8px 0; color:#555;\">${i.json.Description}</p>\n    <p style=\"margin:0; font-size:14px;\">\n      <strong>Language:</strong> ${i.json.Language} &nbsp;|&nbsp;\n      ⭐ <strong>${i.json.Stars}</strong>\n    </p>\n  </div>\n`).join(\"\\n\");\n\nreturn [{\n  json: {\n    html: `<div style=\"max-width:600px; margin:auto;\">${blocks}</div>`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "1ed19655-5b87-4094-a320-fdaef14a9355",
+      "name": "Build HTML"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Clean Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        []
+      ]
+    },
+    "Clean Data": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Build HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build HTML": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "b7f5fd05-f93a-4eea-a605-82da76a749d4",
+  "meta": {
+    "templateId": "2590",
+    "instanceId": "456d0e94e0b1fad346ee0b1c75a91f67a3fe385471542da130a330d04a8aa15b"
+  },
+  "id": "uydCzvo7TseTAj2C",
+  "tags": []
+}
