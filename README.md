@@ -47,7 +47,8 @@ Automatically fetch the latest **GitHub Trending repositories**, clean the data,
 
 ## 📸 Example Output
 
-![image-20250818123031602](C:\Users\gerra\AppData\Roaming\Typora\typora-user-images\image-20250818123031602.png)
+<img width="1061" height="594" alt="image" src="https://github.com/user-attachments/assets/e1b5fb0c-5fe5-489a-b229-6e1bfcfc94c6" />
+
 
 ------
 
