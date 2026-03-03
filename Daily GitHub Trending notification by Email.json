@@ -11,12 +11,12 @@
           ]
         }
       },
-      "id": "53bf597d-3f64-4375-9632-c8aed38e88df",
+      "id": "d7483fbc-5a87-473b-a752-40a8f12e9ad9",
       "name": "Daily Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "position": [
-        368,
-        240
+        0,
+        0
       ],
       "typeVersion": 1.2
     },
@@ -28,32 +28,32 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        576,
-        240
+        208,
+        0
       ],
-      "id": "c418062f-e218-47d1-8613-8b67e52e60cd",
+      "id": "31007886-f29e-4daa-8292-5cedf04fa2f9",
       "name": "HTTP Request"
     },
     {
       "parameters": {
-        "fromEmail": "you@example.com",
-        "toEmail": "you@example.com",
+        "fromEmail": "orderofoneinsertion@gmail.com",
+        "toEmail": "orderofoneinsertion@gmail.com",
         "subject": "=Github Trending ({{ $now.format(\"DD\") }})\n",
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "5b9ea851-df78-4366-a3e0-b5afb563e5ae",
+      "id": "1e984374-6bf2-4ac6-b6b2-c0639277a4af",
       "name": "Send email",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        1504,
-        240
+        1136,
+        0
       ],
       "typeVersion": 2.1,
       "webhookId": "b70385e1-5344-49cb-be71-b56759f0bf22",
       "credentials": {
         "smtp": {
-          "id": "1eizdlwsLy6HnKy4",
+          "id": "iXnro5kLAEYTNHvu",
           "name": "SMTP account"
         }
       }
@@ -65,10 +65,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        784,
-        240
+        416,
+        0
       ],
-      "id": "a2788b0b-baee-4e25-9e31-cdb577fa1da7",
+      "id": "a5a11753-1fb8-4d7f-931f-3333177b6446",
       "name": "Clean Data"
     },
     {
@@ -78,10 +78,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        992,
-        240
+        624,
+        0
       ],
-      "id": "01b69165-06ac-4bf4-8abb-4ee3731b932b",
+      "id": "90a22110-9c4e-4c54-b406-3a28d6965f2f",
       "name": "Extract Data"
     },
     {
@@ -91,10 +91,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1200,
-        240
+        832,
+        0
       ],
-      "id": "1ed19655-5b87-4094-a320-fdaef14a9355",
+      "id": "6faf3711-0716-4dfa-9a69-f31c53db6bbd",
       "name": "Build HTML"
     }
   ],
@@ -120,11 +120,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Send email": {
-      "main": [
-        []
       ]
     },
     "Clean Data": {
@@ -162,12 +157,16 @@
     }
   },
   "active": false,
-  "settings": {},
-  "versionId": "b7f5fd05-f93a-4eea-a605-82da76a749d4",
-  "meta": {
-    "templateId": "2590",
-    "instanceId": "456d0e94e0b1fad346ee0b1c75a91f67a3fe385471542da130a330d04a8aa15b"
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "id": "uydCzvo7TseTAj2C",
+  "versionId": "edb11602-feb7-4029-8ca3-290a63d9b2a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d8fe8e2e7fa1e3b66832529242188f79fda1769eedfc70a1ea128d39f3eecd09"
+  },
+  "id": "nbezcOavkVuwddJ2",
   "tags": []
 }
